@@ -17,7 +17,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  app.use(connect.compress());
+  // app.use(connect.compress());
   app.use(express.static(__dirname + '/public'));
 });
 
