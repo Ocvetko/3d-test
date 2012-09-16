@@ -5,6 +5,7 @@
 
 var express = require('express')
   , routes = require('./routes')
+  , gzippo = require('gzippo')
 
 var app = module.exports = express.createServer();
 
@@ -16,7 +17,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+  app.use(gzippo.staticGzip(__dirname + '/public'));
 });
 
 app.configure('development', function(){
