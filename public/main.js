@@ -1,22 +1,3 @@
-/**
- * Notes:
- * - Coordinates are specified as (X, Y, Z) where X and Z are horizontal and Y
- *   is vertical
- */
-
-var map = [ // 1  2  3  4  5  6  7  8  9
-           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
-           [1, 1, 0, 0, 0, 0, 0, 1, 1, 1,], // 1
-           [1, 1, 0, 0, 2, 0, 0, 0, 0, 1,], // 2
-           [1, 0, 0, 0, 0, 2, 0, 0, 0, 1,], // 3
-           [1, 0, 0, 2, 0, 0, 2, 0, 0, 1,], // 4
-           [1, 0, 0, 0, 2, 0, 0, 0, 1, 1,], // 5
-           [1, 1, 1, 0, 0, 0, 0, 1, 1, 1,], // 6
-           [1, 1, 1, 0, 0, 1, 0, 0, 1, 1,], // 7
-           [1, 1, 1, 1, 1, 1, 0, 0, 1, 1,], // 8
-           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 9
-           ], mapW = map.length, mapH = map[0].length;
-
 // Semi-constants
 var WIDTH = window.innerWidth,
 	HEIGHT = window.innerHeight,
@@ -32,24 +13,11 @@ var WIDTH = window.innerWidth,
 var t = THREE, scene, cam, renderer, controls, clock, projector, model, skin;
 var runAnim = true, mouse = { x: 0, y: 0 }, kills = 0, health = 100;
 var healthCube, lastHealthPickup = 0;
-/*
-var finder = new PF.AStarFinder({ // Defaults to Manhattan heuristic
-	allowDiagonal: true,
-}), grid = new PF.Grid(mapW, mapH, map);
-*/
 
 // Initialize and run on document ready
 $(document).ready(function() {
-	$('body').append('<div id="intro">Click to start Sketchup model WASD navigation</div>');
-	$('#intro').css({width: WIDTH, height: HEIGHT}).one('click', function(e) {
-		e.preventDefault();
-		$(this).fadeOut();
 		init();
 		animate();
-	});
-	
-	
-	
 });
 
 // Setup
@@ -57,7 +25,7 @@ function init() {
 	clock = new t.Clock(); // Used in render() for controls.update()
 	projector = new t.Projector(); // Used in bullet projection
 	scene = new t.Scene(); // Holds all objects in the canvas
-	scene.fog = new t.FogExp2(0xD6F1FF, 0.0005); // color, density
+	scene.fog = new t.FogExp2(0xffffff, 0.0005); // color, density
 	
 	// Set up camera
 	cam = new t.PerspectiveCamera(60, ASPECT, 1, 10000); // FOV, aspect, near, far
@@ -78,7 +46,7 @@ function init() {
 	//setupAI();
 	
 	// Handle drawing as WebGL (faster than Canvas but less supported)
-	renderer = new t.WebGLRenderer();
+	renderer = new t.WebGLRenderer({antialias: true});
 	renderer.setSize(WIDTH, HEIGHT);
 	
 	// Add the canvas to the document
@@ -109,7 +77,7 @@ function render() {
 
 // Set up the objects in the world
 function setupScene() {
-	var UNITSIZE = 250, units = mapW;
+	var UNITSIZE = 250;
 
 
 
@@ -125,22 +93,20 @@ new t.ColladaLoader().load('models/ritning.dae', function(collada) {
 	});
 
 	// Lighting
-	var directionalLight1 = new t.DirectionalLight( 0xffffff, 0.7 );
+	var directionalLight1 = new t.DirectionalLight( 0xffffff, 1 );
 	directionalLight1.position.set( 0.5, 1, 0.5 );
 	scene.add( directionalLight1 );
-	var directionalLight2 = new t.DirectionalLight( 0xffffff, 0.5 );
+	var directionalLight2 = new t.DirectionalLight( 0xffffff, 1 );
 	directionalLight2.position.set( -0.5, -1, -0.5 );
 	scene.add( directionalLight2 );
+
+	var directionalLight3 = new t.DirectionalLight( 0xffffff, 1 );
+	directionalLight1.position.set( 0.2, 1, 0.5 );
+	scene.add( directionalLight3 );
 }
 
 function distance(x1, y1, x2, y2) {
 	return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
-}
-
-function getMapSector(v) {
-	var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
-	var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
-	return {x: x, z: z};
 }
 
 /**
@@ -153,8 +119,7 @@ function getMapSector(v) {
  *   true if the vector is inside a wall; false otherwise.
  */
 function checkWallCollision(v) {
-	var c = getMapSector(v);
-	return map[c.x][c.z] > 0;
+	return false; //map[c.x][c.z] > 0;
 }
 
 /*
@@ -185,7 +150,6 @@ $(window).resize(function() {
 	if (renderer) {
 		renderer.setSize(WIDTH, HEIGHT);
 	}
-	$('#intro, #hurt').css({width: WIDTH, height: HEIGHT,});
 });
 
 // Stop moving around when the window is unfocused (keeps my sanity!)
