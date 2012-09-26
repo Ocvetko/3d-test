@@ -81,7 +81,7 @@ function setupScene() {
 
 
 
-new t.ColladaLoader().load('models/ritning.dae', function(collada) {
+new t.ColladaLoader().load('models/floor.dae', function(collada) {
 		model = collada.scene;
 		skin = collada.skins[0];
 		model.scale.set(2, 2, 2);
